@@ -64,25 +64,6 @@ export default function QuizCreator() {
     setQuestions(questions.map((q) => (q.id === id ? { ...q, ...updates } : q)));
   };
 
-  const handleFileUpload = async (id: string, file: File, type: MediaType) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.url) {
-        updateQuestion(id, { media: data.url, mediaType: type });
-      }
-    } catch (err) {
-      console.error("Upload failed:", err);
-      alert("Failed to upload file.");
-    }
-  };
-
   const handleSave = async () => {
     if (questions.length === 0) {
       setError("Please add at least one question.");
@@ -208,59 +189,60 @@ export default function QuizCreator() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Media Upload */}
+                {/* Media URL */}
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-neutral-500">Optional Media</label>
+                  <label className="block text-sm font-medium text-neutral-500">Media URL (Optional)</label>
                   <div className="flex gap-2">
-                    <label className="flex-1 cursor-pointer">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => e.target.files?.[0] && handleFileUpload(q.id, e.target.files[0], "image")}
-                      />
-                      <div className={cn(
-                        "flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-2xl transition-all",
+                    <button
+                      type="button"
+                      onClick={() => updateQuestion(q.id, { mediaType: 'image' })}
+                      className={cn(
+                        "flex-1 flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-2xl transition-all",
                         q.mediaType === 'image' ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-400"
-                      )}>
-                        <ImageIcon className="w-6 h-6 mb-1" />
-                        <span className="text-xs">Image</span>
-                      </div>
-                    </label>
-                    <label className="flex-1 cursor-pointer">
-                      <input
-                        type="file"
-                        accept="audio/*"
-                        className="hidden"
-                        onChange={(e) => e.target.files?.[0] && handleFileUpload(q.id, e.target.files[0], "audio")}
-                      />
-                      <div className={cn(
-                        "flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-2xl transition-all",
+                      )}
+                    >
+                      <ImageIcon className="w-6 h-6 mb-1" />
+                      <span className="text-xs">Image</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateQuestion(q.id, { mediaType: 'audio' })}
+                      className={cn(
+                        "flex-1 flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-2xl transition-all",
                         q.mediaType === 'audio' ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-400"
-                      )}>
-                        <Music className="w-6 h-6 mb-1" />
-                        <span className="text-xs">Audio</span>
-                      </div>
-                    </label>
-                    <label className="flex-1 cursor-pointer">
-                      <input
-                        type="file"
-                        accept="video/*"
-                        className="hidden"
-                        onChange={(e) => e.target.files?.[0] && handleFileUpload(q.id, e.target.files[0], "video")}
-                      />
-                      <div className={cn(
-                        "flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-2xl transition-all",
+                      )}
+                    >
+                      <Music className="w-6 h-6 mb-1" />
+                      <span className="text-xs">Audio</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateQuestion(q.id, { mediaType: 'video' })}
+                      className={cn(
+                        "flex-1 flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-2xl transition-all",
                         q.mediaType === 'video' ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-400"
-                      )}>
-                        <Video className="w-6 h-6 mb-1" />
-                        <span className="text-xs">Video</span>
-                      </div>
-                    </label>
+                      )}
+                    >
+                      <Video className="w-6 h-6 mb-1" />
+                      <span className="text-xs">Video</span>
+                    </button>
                   </div>
+                  
+                  {q.mediaType && (
+                    <div className="space-y-2">
+                      <input
+                        type="url"
+                        value={q.media || ""}
+                        onChange={(e) => updateQuestion(q.id, { media: e.target.value })}
+                        placeholder={`Enter ${q.mediaType} URL...`}
+                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl outline-none focus:ring-2 focus:ring-neutral-900"
+                      />
+                    </div>
+                  )}
+
                   {q.media && (
                     <div className="relative mt-4 rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-200">
-                      {q.mediaType === 'image' && <img src={q.media} className="w-full h-40 object-cover" />}
+                      {q.mediaType === 'image' && <img src={q.media} className="w-full h-40 object-cover" referrerPolicy="no-referrer" />}
                       {q.mediaType === 'audio' && <audio src={q.media} controls className="w-full p-2" />}
                       {q.mediaType === 'video' && <video src={q.media} controls className="w-full h-40 object-cover" />}
                       <button
