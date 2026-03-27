@@ -1,0 +1,5 @@
+{
+  "name": "QuizMaster Pro",
+  "description": "A full-stack quiz platform with admin management, timed questions, and real-time leaderboards.",
+  "requestFramePermissions": ["camera", "microphone"]
+}

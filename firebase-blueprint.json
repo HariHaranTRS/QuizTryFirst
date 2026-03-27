@@ -1,0 +1,55 @@
+{
+  "entities": {
+    "Quiz": {
+      "title": "Quiz",
+      "description": "A quiz for a specific date.",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "description": "ISO date string (YYYY-MM-DD)" },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "text": { "type": "string" },
+              "media": { "type": "string", "description": "Base64 or URL" },
+              "mediaType": { "type": "string", "enum": ["image", "audio", "video"] },
+              "type": { "type": "string", "enum": ["multiple-choice", "text", "multiple-select"] },
+              "options": { "type": "array", "items": { "type": "string" } },
+              "correctAnswers": { "type": "array", "items": { "type": "string" } },
+              "timer": { "type": "number", "description": "Seconds" },
+              "points": { "type": "number" }
+            }
+          }
+        }
+      },
+      "required": ["date", "questions"]
+    },
+    "Submission": {
+      "title": "Submission",
+      "description": "A user's attempt at a quiz.",
+      "type": "object",
+      "properties": {
+        "quizId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "score": { "type": "number" },
+        "timeTaken": { "type": "number" },
+        "answers": { "type": "string", "description": "JSON stringified array of answers" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["quizId", "userId", "score"]
+    }
+  },
+  "firestore": {
+    "/quizzes/{quizId}": {
+      "schema": "Quiz",
+      "description": "Collection of quizzes indexed by date."
+    },
+    "/submissions/{submissionId}": {
+      "schema": "Submission",
+      "description": "Collection of quiz attempts."
+    }
+  }
+}
